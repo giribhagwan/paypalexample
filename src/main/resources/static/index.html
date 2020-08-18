@@ -1,32 +1,22 @@
-<script src="https://www.paypalobjects.com/api/checkout.js"></script>
- <script src="https://js.braintreegateway.com/web/3.39.0/js/client.min.js"></script>
-<script src="https://js.braintreegateway.com/web/3.39.0/js/paypal-checkout.min.js"></script>
-<div id="paypal-button"></div>
-
+<head>
+    <meta charset="utf-8">
+    <script src="https://js.braintreegateway.com/web/dropin/1.23.0/js/dropin.min.js"></script>
+</head>
+<body>
+<div id="dropin-container"></div>
+<button id="submit-button">Request payment method</button>
 <script>
-  paypal.Button.render({
-    env: 'sandbox', // Or 'production'
-    // Set up the payment:
-    // 1. Add a payment callback
-    payment: function(data, actions) {
-      // 2. Make a request to your server
-      return actions.request.post('/api/create-payment/')
-        .then(function(res) {
-          // 3. Return res.id from the response
-          return res.id;
+    var button = document.querySelector('#submit-button');
+
+    braintree.dropin.create({
+      authorization: 'eyJ2ZXJzaW9uIjoyLCJlbnZpcm9ubWVudCI6InNhbmRib3giLCJhdXRob3JpemF0aW9uRmluZ2VycHJpbnQiOiJleUowZVhBaU9pSktWMVFpTENKaGJHY2lPaUpGVXpJMU5pSXNJbXRwWkNJNklqSXdNVGd3TkRJMk1UWXRjMkZ1WkdKdmVDSXNJbWx6Y3lJNkltaDBkSEJ6T2k4dllYQnBMbk5oYm1SaWIzZ3VZbkpoYVc1MGNtVmxaMkYwWlhkaGVTNWpiMjBpZlEuZXlKbGVIQWlPakUxT1RZNU1Ea3hNRE1zSW1wMGFTSTZJbVpqWkRoaU9XUTVMVGczWlRjdE5EWmxNeTA0TVdZMUxUTmtOamxpTmpKbU5USTBPQ0lzSW5OMVlpSTZJbmxtWm1zMGVXZGlORzQyZW5rek5tSWlMQ0pwYzNNaU9pSm9kSFJ3Y3pvdkwyRndhUzV6WVc1a1ltOTRMbUp5WVdsdWRISmxaV2RoZEdWM1lYa3VZMjl0SWl3aWJXVnlZMmhoYm5RaU9uc2ljSFZpYkdsalgybGtJam9pZVdabWF6UjVaMkkwYmpaNmVUTTJZaUlzSW5abGNtbG1lVjlqWVhKa1gySjVYMlJsWm1GMWJIUWlPbVpoYkhObGZTd2ljbWxuYUhSeklqcGJJbTFoYm1GblpWOTJZWFZzZENKZExDSnpZMjl3WlNJNld5SkNjbUZwYm5SeVpXVTZWbUYxYkhRaVhTd2liM0IwYVc5dWN5STZlMzE5LnczaklqbUcycjN0alB6eGxYSnFFMmdQVVp4NjhjNi1Ba0NxRDNrdXdOZ294Q3JkcGZTQ2JtUFUwTzczakVudVhtSVBsclpDd3ROcl94anVLU0FfM3VnIiwiY29uZmlnVXJsIjoiaHR0cHM6Ly9hcGkuc2FuZGJveC5icmFpbnRyZWVnYXRld2F5LmNvbTo0NDMvbWVyY2hhbnRzL3lmZms0eWdiNG42enkzNmIvY2xpZW50X2FwaS92MS9jb25maWd1cmF0aW9uIiwiZ3JhcGhRTCI6eyJ1cmwiOiJodHRwczovL3BheW1lbnRzLnNhbmRib3guYnJhaW50cmVlLWFwaS5jb20vZ3JhcGhxbCIsImRhdGUiOiIyMDE4LTA1LTA4In0sImNoYWxsZW5nZXMiOltdLCJjbGllbnRBcGlVcmwiOiJodHRwczovL2FwaS5zYW5kYm94LmJyYWludHJlZWdhdGV3YXkuY29tOjQ0My9tZXJjaGFudHMveWZmazR5Z2I0bjZ6eTM2Yi9jbGllbnRfYXBpIiwiYXNzZXRzVXJsIjoiaHR0cHM6Ly9hc3NldHMuYnJhaW50cmVlZ2F0ZXdheS5jb20iLCJhdXRoVXJsIjoiaHR0cHM6Ly9hdXRoLnZlbm1vLnNhbmRib3guYnJhaW50cmVlZ2F0ZXdheS5jb20iLCJhbmFseXRpY3MiOnsidXJsIjoiaHR0cHM6Ly9vcmlnaW4tYW5hbHl0aWNzLXNhbmQuc2FuZGJveC5icmFpbnRyZWUtYXBpLmNvbS95ZmZrNHlnYjRuNnp5MzZiIn0sInRocmVlRFNlY3VyZUVuYWJsZWQiOmZhbHNlLCJwYXlwYWxFbmFibGVkIjp0cnVlLCJwYXlwYWwiOnsiZGlzcGxheU5hbWUiOiJKb2huIERvZSdzIFRlc3QgU3RvcmUiLCJjbGllbnRJZCI6IkFVaDNpMERaRUpSNHdjcGFrZ0NOV21fWTlLendMdXpWaTlhYzNHa1ltUGxYRTdEaV9obTNaVmV4S3pCX2lmX1liZlhOazJtNGE2ckk3UVN1IiwicHJpdmFjeVVybCI6Imh0dHBzOi8vZXhhbXBsZS5jb20iLCJ1c2VyQWdyZWVtZW50VXJsIjoiaHR0cHM6Ly9leGFtcGxlLmNvbSIsImJhc2VVcmwiOiJodHRwczovL2Fzc2V0cy5icmFpbnRyZWVnYXRld2F5LmNvbSIsImFzc2V0c1VybCI6Imh0dHBzOi8vY2hlY2tvdXQucGF5cGFsLmNvbSIsImRpcmVjdEJhc2VVcmwiOm51bGwsImFsbG93SHR0cCI6dHJ1ZSwiZW52aXJvbm1lbnROb05ldHdvcmsiOmZhbHNlLCJlbnZpcm9ubWVudCI6Im9mZmxpbmUiLCJ1bnZldHRlZE1lcmNoYW50IjpmYWxzZSwiYnJhaW50cmVlQ2xpZW50SWQiOiJtYXN0ZXJjbGllbnQzIiwiYmlsbGluZ0FncmVlbWVudHNFbmFibGVkIjp0cnVlLCJtZXJjaGFudEFjY291bnRJZCI6IlVTRCIsImN1cnJlbmN5SXNvQ29kZSI6IlVTRCJ9LCJtZXJjaGFudElkIjoieWZmazR5Z2I0bjZ6eTM2YiIsInZlbm1vIjoib2ZmIn0',
+      container: '#dropin-container'
+    }, function (createErr, instance) {
+      button.addEventListener('click', function () {
+        instance.requestPaymentMethod(function (err, payload) {
+          // Submit payload.nonce to your server
         });
-    },
-    // Execute the payment:
-    // 1. Add an onAuthorize callback
-    onAuthorize: function(data, actions) {
-      // 2. Make a request to your server
-      return actions.request.post('/api/execute-payment/', {
-        paymentID: data.paymentID,
-        payerID:   data.payerID
-      })
-        .then(function(res) {
-          // 3. Show the buyer a confirmation message.
-        });
-    }
-  }, '#paypal-button');
-</script>
+      });
+    });
+  </script>
+</body>
